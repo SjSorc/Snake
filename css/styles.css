@@ -1,0 +1,29 @@
+*{
+    box-sizing: border-box;
+}
+
+#snake-game{
+    padding-left: 225px;
+    padding-top: 50px;
+}
+.board{
+    background: #729240;
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+    box-sizing: content-box;
+}
+
+.board-cell{
+    float: left;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.snake-cell{
+    background: black !important;
+    box-sizing: border-box;
+}
+
+.cell-objective{
+    background: darkred;
+}
