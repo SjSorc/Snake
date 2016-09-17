@@ -90,6 +90,10 @@
                     snake.move('down');
                     break;
 
+                    case 32: //space
+                    snake.pause();
+                    break;
+
                     default: return; // exit this handler for other keys
                 }
 

@@ -19,6 +19,10 @@
             }
         };
 
+        this.pause = function(){
+            this.moving = false;
+        };
+
         this.keepMoving = function(){
             if(!this.moving){
                 return;
@@ -26,8 +30,8 @@
             var nextCell = this.board.canMove(this.head.x, this.head.y, this.direction);
             
             if(nextCell){
-                var newSnakeNode = new SnakeNode(nextCell.cell, nextCell.x, nextCell.y);
-                
+                var newSnakeNode = this.getNewSnakeNode(nextCell.cell, nextCell.x, nextCell.y);
+
                 //snake needs to grow
                 if(nextCell.x === this.board.currentObjective.x && nextCell.y === this.board.currentObjective.y){        
                     this.board.currentObjectiveEaten();
@@ -37,7 +41,7 @@
                     this.head = newSnakeNode;
                 } 
                 else{
-                    resetCell(this.tail.cell);
+                    this.removeNode(this.tail);
 
                     if(this.head.x === this.tail.x && this.head.y === this.tail.y){
                         this.head = newSnakeNode;
@@ -52,7 +56,8 @@
                     }
                 }
 
-                if(loopInSnake(this.tail)){
+                                
+                if(this.loopInSnake(this.head)){
                     this.crash();
                 }
 
@@ -68,6 +73,11 @@
             $(this).trigger('destroy');
         };
 
+        this.removeNode = function(node){
+            resetCell(node.cell);
+            this.allCoordinates[node.x + '-' + node.y] = 0;
+        };
+        
         this.destroy = function(){
             this.board = undefined;
             this.head = undefined;
@@ -97,34 +107,32 @@
         function initialize(){
            this.board = board;
            this.head = new SnakeNode(staringCellData.cell, staringCellData.x, staringCellData.y);
+           this.allCoordinates = {};
+           this.allCoordinates[this.head.x + '-' + this.head.y] = 1;
            this.tail = this.head;
            this.direction = null;
            this.moving = false;
            this.speed = speed;
         };
 
-        function loopInSnake(root){
+        this.loopInSnake = function (node){
             var loopFound = false;
-
-            var fastPointer = root.next;
-            var slowPointer = root;
-
-            if(!root.next){
-                return false;
+            var nodePresenceCount = this.allCoordinates[node.x + '-' + node.y];
+            if(nodePresenceCount > 1){
+                loopFound = true;
             }
-
-            while(fastPointer && fastPointer.next && fastPointer.next.next){
-                fastPointer = fastPointer.next.next;
-                if(fastPointer.x === slowPointer.x && fastPointer.y === slowPointer.y){
-                    loopFound = true;
-                    break;
-                }
-                else{
-                    slowPointer = slowPointer.next;
-                }
-            }
-
             return loopFound;
+        };
+
+        this.getNewSnakeNode = function (cell, x, y){
+            var newSnakeNode = new SnakeNode(cell, x, y);
+            if(this.allCoordinates[x + '-' + y]){
+                this.allCoordinates[x + '-' + y]++;
+            }
+            else{
+                 this.allCoordinates[x + '-' + y] = 1;
+             }
+            return newSnakeNode;
         };
 
         function SnakeNode(cell, x, y){
@@ -133,7 +141,7 @@
             this.y = y;
             this.next = null;
             this.previous = null;
-
+        
             decorateSnakeCell(this.cell);
         };
 
